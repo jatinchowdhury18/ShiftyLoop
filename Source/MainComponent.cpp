@@ -15,7 +15,8 @@ MainComponent::MainComponent()
     transportSource.setSource (readerSource.get(), 0, nullptr, reader->sampleRate);
     transportSource.setLooping (true);
     transportSource.setPosition (0.0);
-    transportSource.start();
+
+    setWantsKeyboardFocus (true);
 
     setAudioChannels (0, 2);
 }
@@ -27,7 +28,22 @@ MainComponent::~MainComponent()
 
 void MainComponent::getNextAudioBlock (const AudioSourceChannelInfo& bufferToFill)
 {
+    if (playState == Stopped)
+        return;
+
     transportSource.getNextAudioBlock (bufferToFill);
+
+    if (playState == Starting)
+    {
+        bufferToFill.buffer->applyGainRamp (0, bufferToFill.numSamples, 0.0f, 1.0f);
+        changePlayState (Playing);
+    }
+    else if (playState == Stopping)
+    {
+        bufferToFill.buffer->applyGainRamp (0, bufferToFill.numSamples, 1.0f, 0.0f);
+        changePlayState (Stopped);
+    }
+
 }
 
 void MainComponent::prepareToPlay (int samplesPerBlockExpected, double sampleRate)
@@ -38,6 +54,20 @@ void MainComponent::prepareToPlay (int samplesPerBlockExpected, double sampleRat
 void MainComponent::releaseResources()
 {
     transportSource.releaseResources();
+}
+
+bool MainComponent::keyPressed (const KeyPress& key)
+{
+    if (key == KeyPress::spaceKey)
+    {
+        if (playState == Stopped || playState == Stopping)
+            changePlayState (Starting);
+
+        else if (playState == Starting || playState == Playing)
+            changePlayState (Stopping);
+    }
+
+    return true;
 }
 
 void MainComponent::paint (Graphics& g)
@@ -55,4 +85,29 @@ void MainComponent::resized()
     // This is called when the MainComponent is resized.
     // If you add any child components, this is where you should
     // update their positions.
+}
+
+void MainComponent::changePlayState (PlayState newState)
+{
+    if (playState == newState)
+        return;
+
+    playState = newState;
+    switch (playState)
+    {
+    case Stopped:
+        transportSource.stop();
+        transportSource.setPosition (0.0);
+        return;
+
+    case Starting:
+        transportSource.start();
+        return;
+
+    case Playing:
+        return;
+
+    case Stopping:
+        return;
+    }
 }
