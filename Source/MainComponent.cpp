@@ -1,6 +1,8 @@
 #include "MainComponent.h"
 
-MainComponent::MainComponent()
+MainComponent::MainComponent() : 
+    cache (5),
+    waveform (512, formatManager, cache)
 {
     setSize (600, 400);
 
@@ -19,11 +21,16 @@ MainComponent::MainComponent()
     setWantsKeyboardFocus (true);
 
     setAudioChannels (0, 2);
+
+    waveform.setSource (new FileInputSource (loop));
 }
 
 MainComponent::~MainComponent()
 {
     shutdownAudio();
+    waveform.clear();
+    cache.clear();
+    waveform.setReader (nullptr, 0);
 }
 
 void MainComponent::getNextAudioBlock (const AudioSourceChannelInfo& bufferToFill)
@@ -73,11 +80,13 @@ bool MainComponent::keyPressed (const KeyPress& key)
 void MainComponent::paint (Graphics& g)
 {
     // (Our component is opaque, so we must completely fill the background with a solid colour)
-    g.fillAll (getLookAndFeel().findColour (ResizableWindow::backgroundColourId));
+    g.fillAll (Colours::transparentWhite);
 
-    g.setFont (Font (16.0f));
-    g.setColour (Colours::white);
-    g.drawText ("Hello World!", getLocalBounds(), Justification::centred, true);
+    //g.setFont (Font (16.0f));
+    //g.setColour (Colours::white);
+    //g.drawText ("Hello World!", getLocalBounds(), Justification::centred, true);
+
+    waveform.drawChannels (g, Rectangle<int> (getWidth(), getHeight()), 0, waveform.getTotalLength(), 1.0f);
 }
 
 void MainComponent::resized()
