@@ -1,24 +1,13 @@
 #pragma once
 
 #include "../JuceLibraryCode/JuceHeader.h"
+#include "AudioPlayer.h"
 
-enum PlayState
-{
-    Stopped,
-    Starting,
-    Playing,
-    Stopping,
-};
-
-class MainComponent   : public AudioAppComponent
+class MainComponent   : public Component
 {
 public:
     MainComponent();
     ~MainComponent();
-
-    void getNextAudioBlock (const AudioSourceChannelInfo& bufferToFill) override;
-    void prepareToPlay (int samplesPerBlockExpected, double sampleRate) override;
-    void releaseResources() override;
 
     bool keyPressed (const KeyPress& key) override;
 
@@ -26,15 +15,10 @@ public:
     void resized() override;
 
 private:
-    AudioFormatManager formatManager;
-    std::unique_ptr<AudioFormatReaderSource> readerSource;
-    AudioTransportSource transportSource;
-    PlayState playState = Stopped;
-
-    void changePlayState (PlayState newState);
+    std::unique_ptr<AudioPlayer> player;
 
     AudioThumbnailCache cache;
-    AudioThumbnail waveform;
+    std::unique_ptr<AudioThumbnail> waveform;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
 };

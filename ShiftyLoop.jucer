@@ -3,6 +3,8 @@
 <JUCERPROJECT id="HXEczk" name="ShiftyLoop" projectType="guiapp" jucerVersion="5.4.1">
   <MAINGROUP id="iwtYK5" name="ShiftyLoop">
     <GROUP id="{653895AE-3E70-4E3D-F99D-A8721AFDDC7A}" name="Source">
+      <FILE id="oBtePS" name="AudioPlayer.cpp" compile="1" resource="0" file="Source/AudioPlayer.cpp"/>
+      <FILE id="B6zXDe" name="AudioPlayer.h" compile="0" resource="0" file="Source/AudioPlayer.h"/>
       <FILE id="XkcDWt" name="MainComponent.h" compile="0" resource="0" file="Source/MainComponent.h"/>
       <FILE id="trvt0t" name="MainComponent.cpp" compile="1" resource="0"
             file="Source/MainComponent.cpp"/>

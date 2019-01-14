@@ -1,78 +1,33 @@
 #include "MainComponent.h"
 
 MainComponent::MainComponent() : 
-    cache (5),
-    waveform (512, formatManager, cache)
+    cache (5)
 {
     setSize (600, 400);
 
-    formatManager.registerBasicFormats();
-
     const File rootDir = File::getCurrentWorkingDirectory().getParentDirectory().getParentDirectory();
     const File loopsDir = File (rootDir.getChildFile ("Loops"));
-    const File loop = File (loopsDir.getChildFile ("drums.wav"));
+    File loop = File (loopsDir.getChildFile ("drums.wav"));
 
-    auto* reader = formatManager.createReaderFor (loop);
-    readerSource.reset (new AudioFormatReaderSource (reader, true));
-    transportSource.setSource (readerSource.get(), 0, nullptr, reader->sampleRate);
-    transportSource.setLooping (true);
-    transportSource.setPosition (0.0);
+    player.reset (new AudioPlayer (loop));
 
     setWantsKeyboardFocus (true);
 
-    setAudioChannels (0, 2);
-
-    waveform.setSource (new FileInputSource (loop));
+    waveform.reset (new AudioThumbnail (512, player->getFormatManager(), cache));
+    waveform->setSource (new FileInputSource (loop));
 }
 
 MainComponent::~MainComponent()
 {
-    shutdownAudio();
-    waveform.clear();
+    waveform->clear();
     cache.clear();
-    waveform.setReader (nullptr, 0);
-}
-
-void MainComponent::getNextAudioBlock (const AudioSourceChannelInfo& bufferToFill)
-{
-    if (playState == Stopped)
-        return;
-
-    transportSource.getNextAudioBlock (bufferToFill);
-
-    if (playState == Starting)
-    {
-        bufferToFill.buffer->applyGainRamp (0, bufferToFill.numSamples, 0.0f, 1.0f);
-        changePlayState (Playing);
-    }
-    else if (playState == Stopping)
-    {
-        bufferToFill.buffer->applyGainRamp (0, bufferToFill.numSamples, 1.0f, 0.0f);
-        changePlayState (Stopped);
-    }
-
-}
-
-void MainComponent::prepareToPlay (int samplesPerBlockExpected, double sampleRate)
-{
-    transportSource.prepareToPlay (samplesPerBlockExpected, sampleRate);
-}
-
-void MainComponent::releaseResources()
-{
-    transportSource.releaseResources();
+    waveform->setReader (nullptr, 0);
 }
 
 bool MainComponent::keyPressed (const KeyPress& key)
 {
     if (key == KeyPress::spaceKey)
-    {
-        if (playState == Stopped || playState == Stopping)
-            changePlayState (Starting);
-
-        else if (playState == Starting || playState == Playing)
-            changePlayState (Stopping);
-    }
+        player->togglePlay();
 
     return true;
 }
@@ -86,7 +41,7 @@ void MainComponent::paint (Graphics& g)
     //g.setColour (Colours::white);
     //g.drawText ("Hello World!", getLocalBounds(), Justification::centred, true);
 
-    waveform.drawChannels (g, Rectangle<int> (getWidth(), getHeight()), 0, waveform.getTotalLength(), 1.0f);
+    waveform->drawChannels (g, Rectangle<int> (getWidth(), getHeight()), 0, waveform->getTotalLength(), 1.0f);
 }
 
 void MainComponent::resized()
@@ -94,29 +49,4 @@ void MainComponent::resized()
     // This is called when the MainComponent is resized.
     // If you add any child components, this is where you should
     // update their positions.
-}
-
-void MainComponent::changePlayState (PlayState newState)
-{
-    if (playState == newState)
-        return;
-
-    playState = newState;
-    switch (playState)
-    {
-    case Stopped:
-        transportSource.stop();
-        transportSource.setPosition (0.0);
-        return;
-
-    case Starting:
-        transportSource.start();
-        return;
-
-    case Playing:
-        return;
-
-    case Stopping:
-        return;
-    }
 }
