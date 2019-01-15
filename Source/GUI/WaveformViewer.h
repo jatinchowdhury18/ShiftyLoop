@@ -2,6 +2,7 @@
 #define WAVEFORMVIEWER_H_INCLUDED
 
 #include "Playhead.h"
+#include "Marker.h"
 #include "../Processors/AudioPlayer.h"
 
 class WaveformViewer : public Component
@@ -18,6 +19,7 @@ private:
     AudioThumbnail waveform;
 
     Playhead playhead;
+    Marker marker;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WaveformViewer)
 };

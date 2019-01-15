@@ -23,17 +23,21 @@ void AudioPlayer::processBlock (AudioBuffer<float>& buffer, MidiBuffer& /*midiBu
 
     const auto numSamples = buffer.getNumSamples();
 
-    if (readerStartSample + numSamples <= reader->lengthInSamples)
+    bool loopToBeginning = readerStartSample > loopEnd;
+    const auto loopEndSample = loopToBeginning ? reader->lengthInSamples : loopEnd;
+    const auto loopStartSample = loopToBeginning ? 0 : loopStart;
+
+    if (readerStartSample + numSamples <= loopEndSample)
     {
         reader->read (&buffer, 0, numSamples, readerStartSample, true, true);
         readerStartSample += numSamples;
     }
     else //loop
     {
-        auto samplesUnder = reader->lengthInSamples - readerStartSample;
+        auto samplesUnder = loopEndSample - readerStartSample;
         reader->read (&buffer, 0, (int) samplesUnder, readerStartSample, true, true);
-        reader->read (&buffer, (int) samplesUnder, numSamples - (int) samplesUnder, 0, true, true);
-        readerStartSample = numSamples - samplesUnder;
+        reader->read (&buffer, (int) samplesUnder, numSamples - (int) samplesUnder, loopStartSample, true, true);
+        readerStartSample = loopStartSample + numSamples - samplesUnder;
     }
 
     //Fade to start play or pause
@@ -48,6 +52,19 @@ void AudioPlayer::processBlock (AudioBuffer<float>& buffer, MidiBuffer& /*midiBu
         changePlayState (Stopped);
     }
 
+}
+
+void AudioPlayer::setLoopMarker (int64 sample, bool isStart)
+{
+    auto& loopMarker = isStart ? loopStart : loopEnd;
+
+    if (sample < 0)
+    {
+        loopMarker = isStart ? 0 : reader->lengthInSamples;
+        return;
+    }
+
+    loopMarker = sample;
 }
 
 void AudioPlayer::prepareToPlay (double /*sampleRate*/, int /*samplesPerBlockExpected*/)

@@ -3,12 +3,15 @@
 WaveformViewer::WaveformViewer (AudioPlayer* player, File& file) : 
     cache (5),
     waveform (512, player->getFormatManager(), cache),
-    playhead (player)
+    playhead (player),
+    marker (player)
 {
     waveform.setSource (new FileInputSource (file));
     setBounds (0, 0, 600, 400);
 
     addAndMakeVisible (playhead);
+
+    addAndMakeVisible (marker);
 }
 
 WaveformViewer::~WaveformViewer()
