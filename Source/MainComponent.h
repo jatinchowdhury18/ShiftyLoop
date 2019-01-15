@@ -2,6 +2,7 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "Processors/AudioPlayer.h"
+#include "Processors/OutputGraph.h"
 #include "GUI/WaveformViewer.h"
 
 class MainComponent   : public Component
@@ -16,7 +17,8 @@ public:
     void resized() override;
 
 private:
-    std::unique_ptr<AudioPlayer> player;
+    std::unique_ptr<OutputGraph> output;
+    AudioPlayer* player;
 
     std::unique_ptr<WaveformViewer> waveformView;
 

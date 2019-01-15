@@ -8,11 +8,12 @@ MainComponent::MainComponent()
     const File loopsDir = File (rootDir.getChildFile ("Loops"));
     File loop = File (loopsDir.getChildFile ("drums.wav"));
 
-    player.reset (new AudioPlayer (loop));
+    player = new AudioPlayer (loop);
+    output.reset (new OutputGraph (player));
 
     setWantsKeyboardFocus (true);
 
-    waveformView.reset (new WaveformViewer (player.get(), loop));
+    waveformView.reset (new WaveformViewer (player, loop));
     addAndMakeVisible (waveformView.get());
 }
 

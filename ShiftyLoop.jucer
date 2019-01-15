@@ -6,6 +6,8 @@
       <GROUP id="{E7C8663D-753A-02CF-5523-4B0763AE2EBE}" name="Processors">
         <FILE id="KKhpFQ" name="AudioPlayer.cpp" compile="1" resource="0" file="Source/Processors/AudioPlayer.cpp"/>
         <FILE id="PHILPq" name="AudioPlayer.h" compile="0" resource="0" file="Source/Processors/AudioPlayer.h"/>
+        <FILE id="P8qRnB" name="OutputGraph.h" compile="0" resource="0" file="Source/Processors/OutputGraph.h"/>
+        <FILE id="bOXT2F" name="ProcessorBase.h" compile="0" resource="0" file="Source/Processors/ProcessorBase.h"/>
       </GROUP>
       <GROUP id="{E281BB5E-B617-82F9-D400-B5D79633CBC0}" name="GUI">
         <FILE id="ZA1LWf" name="Playhead.h" compile="0" resource="0" file="Source/GUI/Playhead.h"/>

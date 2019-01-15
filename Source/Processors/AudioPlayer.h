@@ -1,7 +1,7 @@
 #ifndef AUDIOPLAYHER_H_INCLUDED
 #define AUDIOPLAYHER_H_INCLUDED
 
-#include "JuceHeader.h"
+#include "ProcessorBase.h"
 
 enum PlayState
 {
@@ -11,34 +11,31 @@ enum PlayState
     Stopping,
 };
 
-class AudioPlayer : public AudioSource
+class AudioPlayer : public ProcessorBase
 {
 public:
     AudioPlayer (File& file);
     ~AudioPlayer();
 
-    void getNextAudioBlock (const AudioSourceChannelInfo& bufferToFill) override;
-    void prepareToPlay (int samplesPerBlockExpected, double sampleRate) override;
+    void processBlock (AudioBuffer<float>& buffer, MidiBuffer& midiBuffer) override;
+    void prepareToPlay (double sampleRate, int samplesPerBlockExpected) override;
     void releaseResources() override;
 
     void changePlayState (PlayState newState);
 
-    double getPlayheadPosition() { return transportSource.getCurrentPosition(); }
-    double getAudioLength() { return transportSource.getLengthInSeconds(); }
+    int64 getPlayheadPosition() { return readerStartSample; }
+    int64 getAudioLength() { return reader->lengthInSamples; }
 
     AudioFormatManager& getFormatManager() { return formatManager; }
     void togglePlay();
 
 private:
     AudioFormatManager formatManager;
-    std::unique_ptr<AudioFormatReaderSource> readerSource;
-    AudioTransportSource transportSource;
+    std::unique_ptr<AudioFormatReader> reader;
+
     PlayState playState = Stopped;
 
-    AudioDeviceManager deviceManager;
-    AudioSourcePlayer audioSourcePlayer;
-
-    void setAudioChannels (int numInputChannels, int numOutputChannels);
+    int64 readerStartSample = 0;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioPlayer)
 };

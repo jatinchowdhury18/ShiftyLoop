@@ -1,65 +1,61 @@
 #include "AudioPlayer.h"
 
-AudioPlayer::AudioPlayer (File& file)
+AudioPlayer::AudioPlayer (File& file) : ProcessorBase (String ("Audio Player"))
 {
     formatManager.registerBasicFormats();
 
-    auto* reader = formatManager.createReaderFor (file);
-    readerSource.reset (new AudioFormatReaderSource (reader, true));
+    reader.reset (formatManager.createReaderFor (file.createInputStream()));
 
-    transportSource.setSource (readerSource.get(), 0, nullptr, reader->sampleRate);
-    transportSource.setLooping (true);
-    transportSource.setPosition (0.0);
-
-    setAudioChannels (0, 2);
+    setPlayConfigDetails (0, 2, getSampleRate(), getBlockSize());
 }
 
 AudioPlayer::~AudioPlayer()
 {
-    audioSourcePlayer.setSource (nullptr);
-    deviceManager.removeAudioCallback (&audioSourcePlayer);
-    deviceManager.closeAudioDevice();
 }
 
-void AudioPlayer::setAudioChannels (int numInputChannels, int numOutputChannels)
-{
-    String audioError;
-    audioError = deviceManager.initialise (numInputChannels, numOutputChannels, nullptr, true);
-
-    jassert (audioError.isEmpty());
-
-    deviceManager.addAudioCallback (&audioSourcePlayer);
-    audioSourcePlayer.setSource (this);
-}
-
-void AudioPlayer::getNextAudioBlock (const AudioSourceChannelInfo& bufferToFill)
+void AudioPlayer::processBlock (AudioBuffer<float>& buffer, MidiBuffer& /*midiBuffer*/)
 {
     if (playState == Stopped)
+    {
+        buffer.clear();
         return;
+    }
 
-    transportSource.getNextAudioBlock (bufferToFill);
+    const auto numSamples = buffer.getNumSamples();
 
+    if (readerStartSample + numSamples <= reader->lengthInSamples)
+    {
+        reader->read (&buffer, 0, numSamples, readerStartSample, true, true);
+        readerStartSample += numSamples;
+    }
+    else //loop
+    {
+        auto samplesUnder = reader->lengthInSamples - readerStartSample;
+        reader->read (&buffer, 0, (int) samplesUnder, readerStartSample, true, true);
+        reader->read (&buffer, (int) samplesUnder, numSamples - (int) samplesUnder, 0, true, true);
+        readerStartSample = numSamples - samplesUnder;
+    }
+
+    //Fade to start play or pause
     if (playState == Starting)
     {
-        bufferToFill.buffer->applyGainRamp (0, bufferToFill.numSamples, 0.0f, 1.0f);
+        buffer.applyGainRamp (0, numSamples, 0.0f, 1.0f);
         changePlayState (Playing);
     }
     else if (playState == Stopping)
     {
-        bufferToFill.buffer->applyGainRamp (0, bufferToFill.numSamples, 1.0f, 0.0f);
+        buffer.applyGainRamp (0, numSamples, 1.0f, 0.0f);
         changePlayState (Stopped);
     }
 
 }
 
-void AudioPlayer::prepareToPlay (int samplesPerBlockExpected, double sampleRate)
+void AudioPlayer::prepareToPlay (double /*sampleRate*/, int /*samplesPerBlockExpected*/)
 {
-    transportSource.prepareToPlay (samplesPerBlockExpected, sampleRate);
 }
 
 void AudioPlayer::releaseResources()
 {
-    transportSource.releaseResources();
 }
 
 void AudioPlayer::togglePlay()
@@ -77,21 +73,7 @@ void AudioPlayer::changePlayState (PlayState newState)
         return;
 
     playState = newState;
-    switch (playState)
-    {
-    case Stopped:
-        transportSource.stop();
-        transportSource.setPosition (0.0);
-        return;
-
-    case Starting:
-        transportSource.start();
-        return;
-
-    case Playing:
-        return;
-
-    case Stopping:
-        return;
-    }
+    
+    if (playState == Stopped) //rewind
+        readerStartSample = 0;
 }

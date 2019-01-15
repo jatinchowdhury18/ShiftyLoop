@@ -20,9 +20,10 @@ public:
 
     void paint (Graphics& g) override
     {
-        g.setColour (Colours::green);
+        g.setColour (Colours::forestgreen);
 
-        auto pos = (float) ((player->getPlayheadPosition() / player->getAudioLength()) * getWidth() + getX()); 
+        auto posFraction = (float) player->getPlayheadPosition() / (float) player->getAudioLength();
+        auto pos = (float) (posFraction * getWidth() + getX());
         g.drawLine (pos, (float) getY(), pos, (float) getBottom(), 2.0f);
     }
 
