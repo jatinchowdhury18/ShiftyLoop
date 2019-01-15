@@ -1,7 +1,6 @@
 #include "MainComponent.h"
 
-MainComponent::MainComponent() : 
-    cache (5)
+MainComponent::MainComponent()
 {
     setSize (600, 400);
 
@@ -13,16 +12,11 @@ MainComponent::MainComponent() :
 
     setWantsKeyboardFocus (true);
 
-    waveform.reset (new AudioThumbnail (512, player->getFormatManager(), cache));
-    waveform->setSource (new FileInputSource (loop));
+    waveformView.reset (new WaveformViewer (player.get(), loop));
+    addAndMakeVisible (waveformView.get());
 }
 
-MainComponent::~MainComponent()
-{
-    waveform->clear();
-    cache.clear();
-    waveform->setReader (nullptr, 0);
-}
+MainComponent::~MainComponent() {}
 
 bool MainComponent::keyPressed (const KeyPress& key)
 {
@@ -35,18 +29,16 @@ bool MainComponent::keyPressed (const KeyPress& key)
 void MainComponent::paint (Graphics& g)
 {
     // (Our component is opaque, so we must completely fill the background with a solid colour)
-    g.fillAll (Colours::transparentWhite);
+    g.fillAll (Colours::antiquewhite);
 
     //g.setFont (Font (16.0f));
     //g.setColour (Colours::white);
     //g.drawText ("Hello World!", getLocalBounds(), Justification::centred, true);
 
-    waveform->drawChannels (g, Rectangle<int> (getWidth(), getHeight()), 0, waveform->getTotalLength(), 1.0f);
+    waveformView->repaint();
 }
 
 void MainComponent::resized()
 {
-    // This is called when the MainComponent is resized.
-    // If you add any child components, this is where you should
-    // update their positions.
+    //waveformView->setBounds (0, 0, 600, 400);
 }

@@ -23,6 +23,9 @@ public:
 
     void changePlayState (PlayState newState);
 
+    double getPlayheadPosition() { return transportSource.getCurrentPosition(); }
+    double getAudioLength() { return transportSource.getLengthInSeconds(); }
+
     AudioFormatManager& getFormatManager() { return formatManager; }
     void togglePlay();
 
