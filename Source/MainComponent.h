@@ -1,8 +1,8 @@
 #pragma once
 
 #include "../JuceLibraryCode/JuceHeader.h"
-#include "AudioPlayer.h"
-#include "WaveformViewer.h"
+#include "Processors/AudioPlayer.h"
+#include "GUI/WaveformViewer.h"
 
 class MainComponent   : public Component
 {

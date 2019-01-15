@@ -1,8 +1,7 @@
 #ifndef PLAYHEAD_H_INCLUDED
 #define PLAYHEAD_H_INCLUDED
 
-#include "JuceHeader.h"
-#include "AudioPlayer.h"
+#include "../Processors/AudioPlayer.h"
 
 class Playhead : public Component,
                  private Timer

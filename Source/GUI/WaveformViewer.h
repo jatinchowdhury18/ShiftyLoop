@@ -2,7 +2,7 @@
 #define WAVEFORMVIEWER_H_INCLUDED
 
 #include "Playhead.h"
-#include "AudioPlayer.h"
+#include "../Processors/AudioPlayer.h"
 
 class WaveformViewer : public Component
 {
