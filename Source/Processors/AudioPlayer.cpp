@@ -4,17 +4,33 @@ AudioPlayer::AudioPlayer (File& file) : ProcessorBase (String ("Audio Player"))
 {
     formatManager.registerBasicFormats();
 
-    reader.reset (formatManager.createReaderFor (file.createInputStream()));
+    reader = formatManager.createReaderFor (file.createInputStream());
 
     setPlayConfigDetails (0, 2, getSampleRate(), getBlockSize());
 
-    looper.reset (new Looper (reader->lengthInSamples));
-    looper->changeLoop (loopStart, loopEnd);
-    updateLoop = false;
+    initLooper();
+}
+
+AudioPlayer::AudioPlayer (MemoryInputStream* input) : ProcessorBase (String ("Audio Player"))
+{
+    formatManager.registerBasicFormats();
+
+    reader = formatManager.createReaderFor (input);
+
+    setPlayConfigDetails (0, 2, getSampleRate(), getBlockSize());
+
+    initLooper();
 }
 
 AudioPlayer::~AudioPlayer()
 {
+}
+
+void AudioPlayer::initLooper()
+{
+    looper.reset (new Looper (reader->lengthInSamples));
+    looper->changeLoop (loopStart, loopEnd);
+    updateLoop = false;
 }
 
 void AudioPlayer::processBlock (AudioBuffer<float>& buffer, MidiBuffer& /*midiBuffer*/)

@@ -2,6 +2,11 @@
 
 <JUCERPROJECT id="HXEczk" name="ShiftyLoop" projectType="guiapp" jucerVersion="5.4.1">
   <MAINGROUP id="iwtYK5" name="ShiftyLoop">
+    <GROUP id="{AE69A2F2-4AF9-E0B7-DA74-3372AE402CAE}" name="Loops">
+      <FILE id="ycdlwK" name="James_Gadson.wav" compile="0" resource="1"
+            file="Loops/James_Gadson.wav"/>
+      <FILE id="KASzxk" name="Phil_Selway.wav" compile="0" resource="1" file="Loops/Phil_Selway.wav"/>
+    </GROUP>
     <GROUP id="{653895AE-3E70-4E3D-F99D-A8721AFDDC7A}" name="Source">
       <GROUP id="{E7C8663D-753A-02CF-5523-4B0763AE2EBE}" name="Processors">
         <FILE id="KKhpFQ" name="AudioPlayer.cpp" compile="1" resource="0" file="Source/Processors/AudioPlayer.cpp"/>

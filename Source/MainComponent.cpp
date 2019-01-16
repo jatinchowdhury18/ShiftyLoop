@@ -4,16 +4,19 @@ MainComponent::MainComponent()
 {
     setSize (600, 400);
 
+    /*
     const File rootDir = File::getCurrentWorkingDirectory().getParentDirectory().getParentDirectory();
     const File loopsDir = File (rootDir.getChildFile ("Loops"));
     File loop = File (loopsDir.getChildFile ("Phil_Selway.wav"));
+    */
+    MemoryInputStream* loop = new MemoryInputStream (BinaryData::Phil_Selway_wav, BinaryData::Phil_Selway_wavSize, false);
 
     player = new AudioPlayer (loop);
     output.reset (new OutputGraph (player));
 
     setWantsKeyboardFocus (true);
 
-    waveformView.reset (new WaveformViewer (player, loop));
+    waveformView.reset (new WaveformViewer (player));
     addAndMakeVisible (waveformView.get());
 }
 

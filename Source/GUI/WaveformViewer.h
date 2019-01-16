@@ -8,7 +8,7 @@
 class WaveformViewer : public Component
 {
 public:
-    WaveformViewer (AudioPlayer* player, File& file);
+    WaveformViewer (AudioPlayer* player);
     ~WaveformViewer();
 
     void paint (Graphics&) override;

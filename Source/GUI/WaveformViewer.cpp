@@ -1,12 +1,12 @@
 #include "WaveformViewer.h"
 
-WaveformViewer::WaveformViewer (AudioPlayer* player, File& file) : 
+WaveformViewer::WaveformViewer (AudioPlayer* player) : 
     cache (5),
     waveform (512, player->getFormatManager(), cache),
     playhead (player),
     marker (player)
 {
-    waveform.setSource (new FileInputSource (file));
+    waveform.setReader (player->getReader(), 0x2345);
     setBounds (0, 0, 600, 400);
 
     addAndMakeVisible (playhead);

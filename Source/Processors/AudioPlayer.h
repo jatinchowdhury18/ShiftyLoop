@@ -16,7 +16,9 @@ class AudioPlayer : public ProcessorBase
 {
 public:
     AudioPlayer (File& file);
+    AudioPlayer (MemoryInputStream* input);
     ~AudioPlayer();
+    void initLooper();
 
     void processBlock (AudioBuffer<float>& buffer, MidiBuffer& midiBuffer) override;
     void prepareToPlay (double sampleRate, int samplesPerBlockExpected) override;
@@ -39,9 +41,11 @@ public:
     AudioFormatManager& getFormatManager() { return formatManager; }
     void togglePlay();
 
+    AudioFormatReader* getReader() { return reader; }
+
 private:
     AudioFormatManager formatManager;
-    std::unique_ptr<AudioFormatReader> reader;
+    AudioFormatReader* reader;
 
     PlayState playState = Stopped;
 
