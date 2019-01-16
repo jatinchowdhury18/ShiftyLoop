@@ -10,7 +10,10 @@
         <FILE id="bOXT2F" name="ProcessorBase.h" compile="0" resource="0" file="Source/Processors/ProcessorBase.h"/>
       </GROUP>
       <GROUP id="{E281BB5E-B617-82F9-D400-B5D79633CBC0}" name="GUI">
+        <FILE id="LhLxce" name="Marker.cpp" compile="1" resource="0" file="Source/GUI/Marker.cpp"/>
         <FILE id="eQJKEa" name="Marker.h" compile="0" resource="0" file="Source/GUI/Marker.h"/>
+        <FILE id="JsxjKU" name="MarkerView.cpp" compile="1" resource="0" file="Source/GUI/MarkerView.cpp"/>
+        <FILE id="pV7uX7" name="MarkerView.h" compile="0" resource="0" file="Source/GUI/MarkerView.h"/>
         <FILE id="ZA1LWf" name="Playhead.h" compile="0" resource="0" file="Source/GUI/Playhead.h"/>
         <FILE id="eYjAI7" name="WaveformViewer.cpp" compile="1" resource="0"
               file="Source/GUI/WaveformViewer.cpp"/>

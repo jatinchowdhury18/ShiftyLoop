@@ -21,6 +21,9 @@ public:
     void prepareToPlay (double sampleRate, int samplesPerBlockExpected) override;
     void releaseResources() override;
 
+    void processLoop (AudioBuffer<float>& buffer, int numSamples, const int64 loopStartSample, const int64 loopEndSample);
+    void processStartStop (AudioBuffer<float>& buffer, int numSamples);
+
     void changePlayState (PlayState newState);
 
     int64 getPlayheadPosition() { return readerStartSample; }

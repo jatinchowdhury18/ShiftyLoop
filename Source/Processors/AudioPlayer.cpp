@@ -32,14 +32,22 @@ void AudioPlayer::processBlock (AudioBuffer<float>& buffer, MidiBuffer& /*midiBu
         reader->read (&buffer, 0, numSamples, readerStartSample, true, true);
         readerStartSample += numSamples;
     }
-    else //loop
-    {
-        auto samplesUnder = loopEndSample - readerStartSample;
-        reader->read (&buffer, 0, (int) samplesUnder, readerStartSample, true, true);
-        reader->read (&buffer, (int) samplesUnder, numSamples - (int) samplesUnder, loopStartSample, true, true);
-        readerStartSample = loopStartSample + numSamples - samplesUnder;
-    }
+    else
+        processLoop (buffer, numSamples, loopStartSample, loopEndSample);
 
+    processStartStop (buffer, numSamples);
+}
+
+void AudioPlayer::processLoop (AudioBuffer<float>& buffer, int numSamples, const int64 loopStartSample, const int64 loopEndSample)
+{
+    auto samplesUnder = loopEndSample - readerStartSample;
+    reader->read (&buffer, 0, (int) samplesUnder, readerStartSample, true, true);
+    reader->read (&buffer, (int) samplesUnder, numSamples - (int) samplesUnder, loopStartSample, true, true);
+    readerStartSample = loopStartSample + numSamples - samplesUnder;
+}
+
+void AudioPlayer::processStartStop (AudioBuffer<float>& buffer, int numSamples)
+{
     //Fade to start play or pause
     if (playState == Starting)
     {
@@ -51,7 +59,6 @@ void AudioPlayer::processBlock (AudioBuffer<float>& buffer, MidiBuffer& /*midiBu
         buffer.applyGainRamp (0, numSamples, 1.0f, 0.0f);
         changePlayState (Stopped);
     }
-
 }
 
 void AudioPlayer::setLoopMarker (int64 sample, bool isStart)
