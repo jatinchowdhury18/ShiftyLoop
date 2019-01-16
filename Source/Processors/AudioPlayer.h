@@ -2,6 +2,7 @@
 #define AUDIOPLAYHER_H_INCLUDED
 
 #include "ProcessorBase.h"
+#include "Looper.h"
 
 enum PlayState
 {
@@ -45,8 +46,11 @@ private:
     PlayState playState = Stopped;
 
     int64 readerStartSample = 0;
-    int64 loopStart = 6000;
-    int64 loopEnd = 100000;
+    int64 loopStart;
+    int64 loopEnd;
+    bool updateLoop;
+
+    std::unique_ptr<Looper> looper;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioPlayer)
 };

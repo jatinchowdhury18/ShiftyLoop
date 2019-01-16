@@ -7,6 +7,10 @@ AudioPlayer::AudioPlayer (File& file) : ProcessorBase (String ("Audio Player"))
     reader.reset (formatManager.createReaderFor (file.createInputStream()));
 
     setPlayConfigDetails (0, 2, getSampleRate(), getBlockSize());
+
+    looper.reset (new Looper (reader->lengthInSamples));
+    looper->changeLoop (loopStart, loopEnd);
+    updateLoop = false;
 }
 
 AudioPlayer::~AudioPlayer()
@@ -31,9 +35,18 @@ void AudioPlayer::processBlock (AudioBuffer<float>& buffer, MidiBuffer& /*midiBu
     {
         reader->read (&buffer, 0, numSamples, readerStartSample, true, true);
         readerStartSample += numSamples;
+
+        if (updateLoop)
+        {
+            looper->changeLoop (loopStart, loopEnd);
+            updateLoop = false;
+        }
     }
     else
+    {
         processLoop (buffer, numSamples, loopStartSample, loopEndSample);
+        updateLoop = ! loopToBeginning;
+    }
 
     processStartStop (buffer, numSamples);
 }

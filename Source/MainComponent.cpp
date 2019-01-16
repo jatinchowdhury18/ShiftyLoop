@@ -6,7 +6,7 @@ MainComponent::MainComponent()
 
     const File rootDir = File::getCurrentWorkingDirectory().getParentDirectory().getParentDirectory();
     const File loopsDir = File (rootDir.getChildFile ("Loops"));
-    File loop = File (loopsDir.getChildFile ("drums.wav"));
+    File loop = File (loopsDir.getChildFile ("Phil_Selway.wav"));
 
     player = new AudioPlayer (loop);
     output.reset (new OutputGraph (player));
